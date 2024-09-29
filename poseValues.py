@@ -58,10 +58,17 @@ class PoseValues():
             [
                 [
                     cls.LEFT_ANKLE, cls.LEFT_HIP, cls.LEFT_KNEE
+                ],
+                [
+                    cls.LEFT_KNEE, cls.LEFT_SHOULDER, cls.LEFT_HIP
+                ],
+                [
+                    cls.LEFT_HIP, cls.LEFT_WRIST, cls.LEFT_SHOULDER
                 ]
             ]
         ]
 
+    @classmethod
     def get_right_body(cls) -> list:
         return [
             [
@@ -83,6 +90,12 @@ class PoseValues():
             [
                 [
                     cls.RIGHT_ANKLE, cls.RIGHT_HIP, cls.RIGHT_KNEE
+                ],
+                [
+                    cls.RIGHT_KNEE, cls.RIGHT_SHOULDER, cls.RIGHT_HIP
+                ],
+                [
+                    cls.RIGHT_HIP, cls.RIGHT_WRIST, cls.RIGHT_SHOULDER
                 ]
             ]
         ]
