@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class PoseValues():
     NOSE = 0
     LEFT_EYE_INNER = 1
@@ -51,6 +54,11 @@ class PoseValues():
                 (cls.LEFT_SHOULDER,
                  cls.LEFT_ELBOW),
                 (cls.LEFT_ELBOW, cls.LEFT_WRIST)
+            ],
+            [
+                [
+                    cls.LEFT_ANKLE, cls.LEFT_HIP, cls.LEFT_KNEE
+                ]
             ]
         ]
 
@@ -71,5 +79,24 @@ class PoseValues():
                 (cls.RIGHT_SHOULDER,
                  cls.RIGHT_ELBOW),
                 (cls.RIGHT_ELBOW, cls.RIGHT_WRIST)
+            ],
+            [
+                [
+                    cls.RIGHT_ANKLE, cls.RIGHT_HIP, cls.RIGHT_KNEE
+                ]
             ]
         ]
+
+    @classmethod
+    def get_angle(cls, a, b, center):
+        a = np.array(a)
+        b = np.array(b)
+        center = np.array(center)
+        a_center = a - center
+        b_center = b - center
+
+        cos_angle = np.dot(a_center, b_center) / \
+            (np.linalg.norm(a_center) * np.linalg.norm(b_center))
+        cos_angle = np.clip(cos_angle, -1, 1)
+
+        return np.degrees(np.arccos(cos_angle))
