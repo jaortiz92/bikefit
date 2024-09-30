@@ -38,14 +38,21 @@ class PoseValues():
 
     @classmethod
     def get_left_body(cls) -> list:
+        special_point_one = (cls.LEFT_HEEL, cls.LEFT_FOOT_INDEX)
+        foot_index = (cls.LEFT_FOOT_INDEX, cls.LEFT_FOOT_INDEX)
+        heel = (cls.LEFT_HEEL, cls.LEFT_HEEL)
+
         return [
             [
-                cls.LEFT_ANKLE,   # Tobillo izquierdo
-                cls.LEFT_KNEE,    # Rodilla izquierda
-                cls.LEFT_HIP,     # Cadera izquierda
-                cls.LEFT_SHOULDER,  # Hombro izquierdo
-                cls.LEFT_ELBOW,   # Codo izquierdo
-                cls.LEFT_WRIST
+                cls.LEFT_ANKLE,
+                cls.LEFT_KNEE,
+                cls.LEFT_HIP,
+                cls.LEFT_SHOULDER,
+                cls.LEFT_ELBOW,
+                cls.LEFT_WRIST,
+                cls.LEFT_HEEL,
+                cls.LEFT_FOOT_INDEX,
+                special_point_one
             ],
             [
                 (cls.LEFT_ANKLE, cls.LEFT_KNEE),
@@ -53,7 +60,13 @@ class PoseValues():
                 (cls.LEFT_HIP, cls.LEFT_SHOULDER),
                 (cls.LEFT_SHOULDER,
                  cls.LEFT_ELBOW),
-                (cls.LEFT_ELBOW, cls.LEFT_WRIST)
+                (cls.LEFT_ELBOW, cls.LEFT_WRIST),
+                (cls.LEFT_ANKLE, cls.LEFT_HEEL),
+                (cls.LEFT_HEEL, cls.LEFT_FOOT_INDEX),
+                (
+                    special_point_one,
+                    foot_index
+                )
             ],
             [
                 [
@@ -64,20 +77,30 @@ class PoseValues():
                 ],
                 [
                     cls.LEFT_HIP, cls.LEFT_WRIST, cls.LEFT_SHOULDER
+                ],
+                [
+                    special_point_one, heel, foot_index
                 ]
             ]
         ]
 
     @classmethod
     def get_right_body(cls) -> list:
+        special_point_one = (cls.RIGHT_HEEL, cls.RIGHT_FOOT_INDEX)
+        foot_index = (cls.RIGHT_FOOT_INDEX, cls.RIGHT_FOOT_INDEX)
+        heel = (cls.RIGHT_HEEL, cls.RIGHT_HEEL)
+
         return [
             [
-                cls.RIGHT_ANKLE,   # Tobillo izquierdo
-                cls.RIGHT_KNEE,    # Rodilla izquierda
-                cls.RIGHT_HIP,     # Cadera izquierda
-                cls.RIGHT_SHOULDER,  # Hombro izquierdo
-                cls.RIGHT_ELBOW,   # Codo izquierdo
-                cls.RIGHT_WRIST
+                cls.RIGHT_ANKLE,
+                cls.RIGHT_KNEE,
+                cls.RIGHT_HIP,
+                cls.RIGHT_SHOULDER,
+                cls.RIGHT_ELBOW,
+                cls.RIGHT_WRIST,
+                cls.RIGHT_HEEL,
+                cls.RIGHT_FOOT_INDEX,
+                special_point_one
             ],
             [
                 (cls.RIGHT_ANKLE, cls.RIGHT_KNEE),
@@ -85,7 +108,13 @@ class PoseValues():
                 (cls.RIGHT_HIP, cls.RIGHT_SHOULDER),
                 (cls.RIGHT_SHOULDER,
                  cls.RIGHT_ELBOW),
-                (cls.RIGHT_ELBOW, cls.RIGHT_WRIST)
+                (cls.RIGHT_ELBOW, cls.RIGHT_WRIST),
+                (cls.RIGHT_ANKLE, cls.RIGHT_HEEL),
+                (cls.RIGHT_HEEL, cls.RIGHT_FOOT_INDEX),
+                (
+                    special_point_one,
+                    foot_index
+                )
             ],
             [
                 [
@@ -96,6 +125,9 @@ class PoseValues():
                 ],
                 [
                     cls.RIGHT_HIP, cls.RIGHT_WRIST, cls.RIGHT_SHOULDER
+                ],
+                [
+                    special_point_one, heel, foot_index
                 ]
             ]
         ]
