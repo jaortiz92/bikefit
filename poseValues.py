@@ -41,6 +41,11 @@ class PoseValues():
         special_point_one = (cls.LEFT_HEEL, cls.LEFT_FOOT_INDEX)
         foot_index = (cls.LEFT_FOOT_INDEX, cls.LEFT_FOOT_INDEX)
         heel = (cls.LEFT_HEEL, cls.LEFT_HEEL)
+        keys_to_special_moments = {
+            'lowest_point': special_point_one,
+            'highest_point': special_point_one,
+            'middle_point': special_point_one
+        }
 
         return [
             [
