@@ -15,12 +15,17 @@ class DrawPoseValues():
     ):
         self.is_image: bool = is_image
         self.is_right: bool = is_right
+        self.counter: int = 0
         self.name_input: str = '{}/{}.{}'.format(path, name, format)
         self.name_output: str = '{}/result_{}.{}'.format(path, name, format)
         self.key_moments: dict = {
             'lowest_point': None,
             'highest_point': None,
-            'middle_point': None
+            'middle_point_one': None,
+            'middle_point_two': None,
+            'frames_to_key_moments': 30,
+            'status': False,
+            'minimum_time': 30 * 6
         }
         self.generate()
 
@@ -28,7 +33,10 @@ class DrawPoseValues():
         mp_drawing = mp.solutions.drawing_utils
         mp_pose = mp.solutions.pose
 
-        with mp_pose.Pose(static_image_mode=True) as pose:
+        with mp_pose.Pose(
+            static_image_mode=True, min_detection_confidence=0.9,
+            min_tracking_confidence=0.9,
+        ) as pose:
             if self.is_image:
                 image = cv2.imread(self.name_input)
                 height, width, _ = image.shape
@@ -66,9 +74,15 @@ class DrawPoseValues():
                         image = frame
                         image = self.add_values(
                             result_pose, image,
-                            self.is_right, width, height,
+                            self.is_right, width,
+                            height
                         )
-                    out.write(image)
+                    if self.key_moments['status']:
+                        for _ in range(self.key_moments['frames_to_key_moments']):
+                            out.write(image)
+                    else:
+                        out.write(image)
+                    self.counter += 1
 
     def add_values(
             self, result_pose, image, is_right: bool,
@@ -81,7 +95,7 @@ class DrawPoseValues():
         else:
             funct = PoseValues.get_left_body
 
-        points, connections, angles = funct()
+        points, connections, angles, special_moments = funct()
 
         for connection in connections:
             if not isinstance(connection[0], tuple):
@@ -119,6 +133,14 @@ class DrawPoseValues():
                 -1
             )
 
+        lowest_point = landmarks[special_moments['lowest_point'][1]].y
+        highest_point = landmarks[special_moments['highest_point'][1]].y
+        middle_point = landmarks[special_moments['middle_point'][0]].x
+
+        self.validate_special_moment(
+            lowest_point, highest_point, middle_point
+        )
+
         for angle in angles:
             if not isinstance(angle[0], tuple):
                 x1 = landmarks[angle[0]].x * width
@@ -154,11 +176,17 @@ class DrawPoseValues():
 
             image_transparent = image.copy()
 
+            color_background = (
+                Constants.COLOR_BACKGROUND_ESPECIAL
+                if self.key_moments['status'] else
+                Constants.COLOR_BACKGROUND
+            )
+
             cv2.rectangle(
                 image_transparent,
                 rectangle[0],
                 rectangle[1],
-                Constants.COLOR_BACKGROUND,
+                color_background,
                 -1
             )
 
@@ -180,3 +208,33 @@ class DrawPoseValues():
             )
 
         return image
+
+    def validate_special_moment(self, lowest_point, highest_point, middle_point):
+        status: bool = False
+        if self.counter > self.key_moments['minimum_time']:
+            if self.key_moments['lowest_point'] is None:
+                self.key_moments['lowest_point'] = lowest_point
+                self.key_moments['highest_point'] = highest_point
+                self.key_moments['middle_point_one'] = middle_point
+                self.key_moments['middle_point_two'] = middle_point
+            else:
+                if self.key_moments['lowest_point'] < lowest_point:
+                    self.key_moments['lowest_point'] = lowest_point
+                if self.key_moments['highest_point'] > highest_point:
+                    self.key_moments['highest_point'] = highest_point
+                if self.key_moments['middle_point_one'] > middle_point:
+                    self.key_moments['middle_point_one'] = middle_point
+                if self.key_moments['middle_point_two'] < middle_point:
+                    self.key_moments['middle_point_two'] = middle_point
+
+            if self.counter > self.key_moments['minimum_time'] + 60:
+                alpha = 0.01
+                if self.key_moments['lowest_point'] < lowest_point * (1 + alpha):
+                    status = True
+                elif self.key_moments['highest_point'] > highest_point * (1 - alpha):
+                    status = True
+                elif self.key_moments['middle_point_one'] > middle_point * (1 - alpha):
+                    status = True
+                elif self.key_moments['middle_point_two'] < middle_point * (1 + alpha):
+                    status = True
+        self.key_moments['status'] = status
