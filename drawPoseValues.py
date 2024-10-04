@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+import numpy as np
 
 
 from constants import Constants
@@ -23,9 +24,16 @@ class DrawPoseValues():
             'highest_point': None,
             'middle_point_one': None,
             'middle_point_two': None,
-            'frames_to_key_moments': 30,
+            'frames_to_key_moments': 15,
             'status': False,
+            'key_moment_active': None,
             'minimum_time': 30 * 6
+        }
+        self.data: dict[str, list] = {
+            'lowest_point': [],
+            'highest_point': [],
+            'middle_point_one': [],
+            'middle_point_two': [],
         }
         self.generate()
 
@@ -133,9 +141,11 @@ class DrawPoseValues():
                 -1
             )
 
-        lowest_point = landmarks[special_moments['lowest_point'][1]].y
-        highest_point = landmarks[special_moments['highest_point'][1]].y
-        middle_point = landmarks[special_moments['middle_point'][0]].x
+        lowest_point = landmarks[special_moments['lowest_point'][1]].y * height
+        highest_point = landmarks[
+            special_moments['highest_point'][1]
+        ].y * height
+        middle_point = landmarks[special_moments['middle_point'][0]].x * width
 
         self.validate_special_moment(
             lowest_point, highest_point, middle_point
@@ -207,6 +217,9 @@ class DrawPoseValues():
                 Constants.COLOR_FONT
             )
 
+            if self.key_moments['status']:
+                pass
+
         return image
 
     def validate_special_moment(self, lowest_point, highest_point, middle_point):
@@ -231,10 +244,14 @@ class DrawPoseValues():
                 alpha = 0.01
                 if self.key_moments['lowest_point'] < lowest_point * (1 + alpha):
                     status = True
+                    self.key_moments['key_moment_active'] = 'lowest_point'
                 elif self.key_moments['highest_point'] > highest_point * (1 - alpha):
                     status = True
+                    self.key_moments['key_moment_active'] = 'highest_point'
                 elif self.key_moments['middle_point_one'] > middle_point * (1 - alpha):
                     status = True
+                    self.key_moments['key_moment_active'] = 'middle_point_one'
                 elif self.key_moments['middle_point_two'] < middle_point * (1 + alpha):
                     status = True
+                    self.key_moments['key_moment_active'] = 'middle_point_two'
         self.key_moments['status'] = status
