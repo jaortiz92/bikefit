@@ -73,20 +73,20 @@ class PoseValues():
                     foot_index
                 )
             ],
-            [
-                [
+            {
+                'lower_part':[
                     cls.LEFT_ANKLE, cls.LEFT_HIP, cls.LEFT_KNEE
                 ],
-                [
+                'mid_part':[
                     cls.LEFT_KNEE, cls.LEFT_SHOULDER, cls.LEFT_HIP
                 ],
-                [
+                'hight_part':[
                     cls.LEFT_HIP, cls.LEFT_WRIST, cls.LEFT_SHOULDER
                 ],
-                [
+                'foot':[
                     special_point_one, heel, foot_index
                 ]
-            ],
+            },
             keys_to_special_moments
         ]
 

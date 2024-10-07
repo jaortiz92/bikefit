@@ -5,7 +5,7 @@ import numpy as np
 
 from constants import Constants
 from poseValues import PoseValues
-
+from utils import save_data
 
 class DrawPoseValues():
 
@@ -36,6 +36,8 @@ class DrawPoseValues():
             'middle_point_two': [],
         }
         self.generate()
+        if not is_image:
+            save_data(self.data)
 
     def generate(self):
         mp_drawing = mp.solutions.drawing_utils
@@ -151,7 +153,8 @@ class DrawPoseValues():
             lowest_point, highest_point, middle_point
         )
 
-        for angle in angles:
+        data_temp = []
+        for name_angle, angle in angles.items():
             if not isinstance(angle[0], tuple):
                 x1 = landmarks[angle[0]].x * width
                 x2 = landmarks[angle[1]].x * width
@@ -218,9 +221,18 @@ class DrawPoseValues():
             )
 
             if self.key_moments['status']:
-                pass
-
+                data_temp.append(
+                    name_angle, x1, y1, x2, y2,
+                    x_center, y_center, angle_result
+                )
+        if len(data_temp)>0:
+            data_temp.append(self.counter)
+            data_temp.append(self.name)
+            self.data[self.key_moments['key_moment_active']].append(
+                data_temp
+            )
         return image
+
 
     def validate_special_moment(self, lowest_point, highest_point, middle_point):
         status: bool = False
