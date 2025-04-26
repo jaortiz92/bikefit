@@ -44,8 +44,11 @@ class DrawPoseValues():
         mp_pose = mp.solutions.pose
 
         with mp_pose.Pose(
-            static_image_mode=True, min_detection_confidence=0.9,
+            static_image_mode=self.is_image, # True, 
+            model_complexity=2,
+            min_detection_confidence=0.9,
             min_tracking_confidence=0.9,
+            enable_segmentation=True
         ) as pose:
             if self.is_image:
                 image = cv2.imread(self.name_input)
@@ -81,18 +84,23 @@ class DrawPoseValues():
                     result_pose = pose.process(image_rgb)
 
                     if result_pose.pose_landmarks:
-                        image = frame
                         image = self.add_values(
-                            result_pose, image,
+                            result_pose, frame,
                             self.is_right, width,
                             height
                         )
+                    else:
+                        image = frame
+
                     if self.key_moments['status']:
                         for _ in range(self.key_moments['frames_to_key_moments']):
                             out.write(image)
                     else:
                         out.write(image)
                     self.counter += 1
+
+                cap.release()
+                out.release()
 
     def add_values(
             self, result_pose, image, is_right: bool,
