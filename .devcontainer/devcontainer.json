@@ -1,0 +1,28 @@
+{
+    "name": "BikeFit DevContainer",
+    "dockerComposeFile": "../docker-compose.yaml",
+    "service": "bikefit",
+    "workspaceFolder": "/usr/local/app",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "esbenp.prettier-vscode" // Prettier extension
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true,
+                // Prettier configuration
+                "editor.formatOnSave": true,
+                "editor.defaultFormatter": "esbenp.prettier-vscode",
+                "[python]": {
+                    "editor.defaultFormatter": "ms-python.python"
+                }
+            }
+        }
+    },
+
+    "postCreateCommand": "pip install --no-cache-dir -r requirements.txt"
+}

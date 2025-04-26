@@ -3,31 +3,31 @@ import mediapipe as mp
 import numpy as np
 
 
-from constants import Constants
-from poseValues import PoseValues
-from utils import save_data
+from .constants import Constants
+from .poseValues import PoseValues
+from .utils import save_data
 
 class DrawPoseValues():
 
     def __init__(
-        self, path: str, name: str,
+        self, name: str,
         format: str, is_image: bool = True,
         is_right: bool = True
     ):
         self.is_image: bool = is_image
         self.is_right: bool = is_right
         self.counter: int = 0
-        self.name_input: str = '{}/{}.{}'.format(path, name, format)
-        self.name_output: str = '{}/result_{}.{}'.format(path, name, format)
+        self.name_input: str = '{}/{}.{}'.format(Constants.IN, name, format)
+        self.name_output: str = '{}/result_{}.{}'.format(Constants.OUT, name, format)
         self.key_moments: dict = {
             'lowest_point': None,
             'highest_point': None,
             'middle_point_one': None,
             'middle_point_two': None,
-            'frames_to_key_moments': 15,
+            'frames_to_key_moments': Constants.FRAMES_TO_KEY_MOMENTS,
             'status': False,
             'key_moment_active': None,
-            'minimum_time': 30 * 6
+            'minimum_time': Constants.MINIMUN_TIME
         }
         self.data: dict[str, list] = {
             'lowest_point': [],
@@ -222,12 +222,13 @@ class DrawPoseValues():
 
             if self.key_moments['status']:
                 data_temp.append(
-                    name_angle, x1, y1, x2, y2,
-                    x_center, y_center, angle_result
+                    [
+                        name_angle, x1, y1, x2, y2,
+                        x_center, y_center, angle_result
+                    ]
                 )
         if len(data_temp)>0:
             data_temp.append(self.counter)
-            data_temp.append(self.name)
             self.data[self.key_moments['key_moment_active']].append(
                 data_temp
             )

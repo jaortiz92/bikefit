@@ -1,0 +1,14 @@
+services:
+  bikefit:
+    build: 
+      context: ./
+    container_name: bikefit-container
+    command: sleep infinity 
+    volumes:
+      - .:/usr/local/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
