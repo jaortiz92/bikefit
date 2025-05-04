@@ -130,13 +130,13 @@ class PoseValues():
             ],
             {
                 'lower_part':[
-                    cls.LEFT_ANKLE, cls.LEFT_HIP, cls.LEFT_KNEE
+                    cls.RIGHT_ANKLE, cls.RIGHT_HIP, cls.RIGHT_KNEE
                 ],
                 'mid_part':[
-                    cls.LEFT_KNEE, cls.LEFT_SHOULDER, cls.LEFT_HIP
+                    cls.RIGHT_KNEE, cls.RIGHT_SHOULDER, cls.RIGHT_HIP
                 ],
                 'hight_part':[
-                    cls.LEFT_HIP, cls.LEFT_WRIST, cls.LEFT_SHOULDER
+                    cls.RIGHT_HIP, cls.RIGHT_WRIST, cls.RIGHT_SHOULDER
                 ],
                 'foot':[
                     special_point_one, heel, foot_index
