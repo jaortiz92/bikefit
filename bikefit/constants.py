@@ -11,7 +11,7 @@ class Constants:
     COLOR_BACKGROUND_ESPECIAL: Tuple[int] = (229, 255, 204)
     RADIUS_SIZE: int = 6
     LINE_SIZE: int = 3
-    ALPHA_BACKGROUND: int = 0.5
+    ALPHA_BACKGROUND: int = 0.6
 
 
     FRAMES_TO_KEY_MOMENTS: int = 5
