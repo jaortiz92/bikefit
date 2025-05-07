@@ -6,9 +6,11 @@ import numpy as np
 from .constants import Constants
 from .poseValues import PoseValues
 from .utils import save_data
+from ultralytics import YOLO
 
 
 class DrawPoseValues():
+    model = YOLO("yolo11s-seg")
 
     def __init__(
         self, name: str,
@@ -65,7 +67,7 @@ class DrawPoseValues():
             smooth_landmarks=True,    # Suavizado entre frames
             min_detection_confidence=0.95,  # Más estricto para evitar falsos positivos
             min_tracking_confidence=0.99,    # Exigir seguimiento consistente
-            enable_segmentation=False,        # Usar máscara para aislar al ciclista
+            enable_segmentation=True,        # Usar máscara para aislar al ciclista
             smooth_segmentation=True,        # Suavizar máscara entre frames
         ) as pose:
             if self.is_image:
@@ -90,6 +92,15 @@ class DrawPoseValues():
                 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
                 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+                # Create background subtractor
+                bg_subtractor = cv2.createBackgroundSubtractorMOG2(
+                    history=500, # Frames used to create the background
+                    varThreshold=10, # Sensibility to the movements
+                    detectShadows=True, # Detect shadow
+                )
+                kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
+                heatmap_refined = None
+
                 out = cv2.VideoWriter(
                     self.name_output,
                     fourcc, fps, (width, height))
@@ -98,8 +109,11 @@ class DrawPoseValues():
                     ret, frame = cap.read()
                     if not ret:
                         break
+                    
+                    yolo_masks = self.get_yolo_person_mask(frame) 
+                    roi_frame = cv2.bitwise_and(frame, frame, mask=yolo_masks)
 
-                    image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    image_rgb = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2RGB)
                     result_pose = pose.process(image_rgb)
 
                     if result_pose.pose_landmarks:
@@ -118,6 +132,7 @@ class DrawPoseValues():
                         out.write(image)
 
                     cv2.imshow('Cyclist Tracking', frame)
+                    cv2.imshow('Cyclist Trackingmask', roi_frame)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
 
@@ -126,6 +141,19 @@ class DrawPoseValues():
                 cap.release()
                 out.release()
                 cv2.destroyAllWindows()
+
+    def get_yolo_person_mask(self, frame):
+        results = self.model(frame)[0]
+        combined_mask = np.zeros(frame.shape[:2], dtype=np.uint8)
+        
+        if results.masks is not None:
+            for mask, cls in zip(results.masks.data, results.boxes.cls):
+                if int(cls) == 0:  # Person class
+                    mask_np = mask.cpu().numpy().astype(np.uint8) * 255
+                    resized_mask = cv2.resize(mask_np, (frame.shape[1], frame.shape[0]))
+                    combined_mask = cv2.bitwise_or(combined_mask, resized_mask)
+        
+        return combined_mask
 
     def add_values(
             self, result_pose, image, is_right: bool,
