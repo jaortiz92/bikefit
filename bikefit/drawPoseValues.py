@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 from .constants import Constants
@@ -62,8 +63,8 @@ class DrawPoseValues():
         with mp_pose.Pose(
             static_image_mode=self.is_image,
             model_complexity=2,       # Máxima complejidad del modelo
-            smooth_landmarks=True,    # Suavizado entre frames
-            min_detection_confidence=0.95,  # Más estricto para evitar falsos positivos
+            smooth_landmarks= not self.is_image,    # Suavizado entre frames
+            min_detection_confidence= 0.8 if self.is_image else 0.95,  # Más estricto para evitar falsos positivos
             min_tracking_confidence=0.99,    # Exigir seguimiento consistente
             enable_segmentation=False,        # Usar máscara para aislar al ciclista
             smooth_segmentation=True,        # Suavizar máscara entre frames
@@ -72,7 +73,7 @@ class DrawPoseValues():
                 image = cv2.imread(self.name_input)
                 height, width, _ = image.shape
 
-                image_rgb = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 image_rgb = self._preprocess_frame(image_rgb)
 
                 result_pose = pose.process(image_rgb)
@@ -100,6 +101,7 @@ class DrawPoseValues():
                         break
 
                     image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    image_rgb = self._preprocess_frame(image_rgb)
                     result_pose = pose.process(image_rgb)
 
                     if result_pose.pose_landmarks:
@@ -138,7 +140,7 @@ class DrawPoseValues():
         points, connections, angles, special_moments = funct()
 
         # Draw lines to connect points
-        for connection in connections:
+        for index, connection in enumerate(connections):
             if not isinstance(connection[0], tuple):
                 x1 = landmarks[connection[0]].x
                 x2 = landmarks[connection[1]].x
@@ -159,13 +161,22 @@ class DrawPoseValues():
             )
 
             if start_point and end_point:
-                cv2.line(
-                    image,
-                    start_point,
-                    end_point,
-                    Constants.COLOR_CONNECTION,
-                    Constants.LINE_SIZE
-                )
+                if len(connections) - 2 <= index:
+                    cv2.line(
+                        image,
+                        start_point,
+                        end_point,
+                        Constants.COLOR_CONNECTION_SECONDARY,
+                        Constants.LINE_SIZE_SECONDARY
+                    )
+                else: 
+                    cv2.line(
+                        image,
+                        start_point,
+                        end_point,
+                        Constants.COLOR_CONNECTION,
+                        Constants.LINE_SIZE
+                    )
 
 
         # Draw points
