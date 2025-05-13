@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 from .constants import Constants
@@ -46,16 +47,16 @@ class DrawPoseValues():
     def _preprocess_frame(self, frame):
         """Proprocess the image or frame to a better result"""
         # Upscale 2x
-        high_res = cv2.resize(frame, (0,0), fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
-        
+        high_res = cv2.resize(frame, (0, 0), fx=4, fy=4,
+                              interpolation=cv2.INTER_CUBIC)
+
         # CLAHE para contraste
         lab = cv2.cvtColor(high_res, cv2.COLOR_RGB2LAB)
         l, a, b = cv2.split(lab)
-        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
         l = clahe.apply(l)
-        enhanced = cv2.merge((l,a,b))
+        enhanced = cv2.merge((l, a, b))
         return cv2.cvtColor(enhanced, cv2.COLOR_LAB2RGB)
-
 
     def generate(self):
         mp_drawing = mp.solutions.drawing_utils
@@ -64,8 +65,9 @@ class DrawPoseValues():
         with mp_pose.Pose(
             static_image_mode=self.is_image,
             model_complexity=2,       # Máxima complejidad del modelo
-            smooth_landmarks=True,    # Suavizado entre frames
-            min_detection_confidence=0.95,  # Más estricto para evitar falsos positivos
+            smooth_landmarks=not self.is_image,    # Suavizado entre frames
+            # Más estricto para evitar falsos positivos
+            min_detection_confidence=0.8 if self.is_image else 0.95,
             min_tracking_confidence=0.99,    # Exigir seguimiento consistente
             enable_segmentation=True,        # Usar máscara para aislar al ciclista
             smooth_segmentation=True,        # Suavizar máscara entre frames
@@ -74,7 +76,7 @@ class DrawPoseValues():
                 image = cv2.imread(self.name_input)
                 height, width, _ = image.shape
 
-                image_rgb = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 image_rgb = self._preprocess_frame(image_rgb)
 
                 result_pose = pose.process(image_rgb)
@@ -94,11 +96,11 @@ class DrawPoseValues():
 
                 # Create background subtractor
                 bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-                    history=500, # Frames used to create the background
-                    varThreshold=10, # Sensibility to the movements
-                    detectShadows=True, # Detect shadow
+                    history=500,  # Frames used to create the background
+                    varThreshold=10,  # Sensibility to the movements
+                    detectShadows=True,  # Detect shadow
                 )
-                kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
+                kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
                 heatmap_refined = None
 
                 out = cv2.VideoWriter(
@@ -109,11 +111,12 @@ class DrawPoseValues():
                     ret, frame = cap.read()
                     if not ret:
                         break
-                    
-                    yolo_masks = self.get_yolo_person_mask(frame) 
+
+                    yolo_masks = self.get_yolo_person_mask(frame)
                     roi_frame = cv2.bitwise_and(frame, frame, mask=yolo_masks)
 
                     image_rgb = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2RGB)
+                    image_rgb = self._preprocess_frame(image_rgb)
                     result_pose = pose.process(image_rgb)
 
                     if result_pose.pose_landmarks:
@@ -145,14 +148,15 @@ class DrawPoseValues():
     def get_yolo_person_mask(self, frame):
         results = self.model(frame)[0]
         combined_mask = np.zeros(frame.shape[:2], dtype=np.uint8)
-        
+
         if results.masks is not None:
             for mask, cls in zip(results.masks.data, results.boxes.cls):
                 if int(cls) == 0:  # Person class
                     mask_np = mask.cpu().numpy().astype(np.uint8) * 255
-                    resized_mask = cv2.resize(mask_np, (frame.shape[1], frame.shape[0]))
+                    resized_mask = cv2.resize(
+                        mask_np, (frame.shape[1], frame.shape[0]))
                     combined_mask = cv2.bitwise_or(combined_mask, resized_mask)
-        
+
         return combined_mask
 
     def add_values(
@@ -166,7 +170,7 @@ class DrawPoseValues():
         points, connections, angles, special_moments = funct()
 
         # Draw lines to connect points
-        for connection in connections:
+        for index, connection in enumerate(connections):
             if not isinstance(connection[0], tuple):
                 x1 = landmarks[connection[0]].x
                 x2 = landmarks[connection[1]].x
@@ -178,7 +182,6 @@ class DrawPoseValues():
                 y1 = landmarks[connection[0][1]].y
                 y2 = landmarks[connection[1][1]].y
 
-
             start_point = mp.solutions.drawing_utils._normalized_to_pixel_coordinates(
                 x1, y1, width, height
             )
@@ -187,14 +190,22 @@ class DrawPoseValues():
             )
 
             if start_point and end_point:
-                cv2.line(
-                    image,
-                    start_point,
-                    end_point,
-                    Constants.COLOR_CONNECTION,
-                    Constants.LINE_SIZE
-                )
-
+                if len(connections) - 2 <= index:
+                    cv2.line(
+                        image,
+                        start_point,
+                        end_point,
+                        Constants.COLOR_CONNECTION_SECONDARY,
+                        Constants.LINE_SIZE_SECONDARY
+                    )
+                else:
+                    cv2.line(
+                        image,
+                        start_point,
+                        end_point,
+                        Constants.COLOR_CONNECTION,
+                        Constants.LINE_SIZE
+                    )
 
         # Draw points
         for point in points:
