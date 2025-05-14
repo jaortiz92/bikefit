@@ -47,8 +47,10 @@ class DrawPoseValues():
     def _preprocess_frame(self, frame):
         """Proprocess the image or frame to a better result"""
         # Upscale 2x
-        high_res = cv2.resize(frame, (0, 0), fx=4, fy=4,
-                              interpolation=cv2.INTER_CUBIC)
+        high_res = cv2.resize(
+            frame, (0, 0), fx=2, fy=2,
+            interpolation=cv2.INTER_CUBIC
+        )
 
         # CLAHE para contraste
         lab = cv2.cvtColor(high_res, cv2.COLOR_RGB2LAB)
