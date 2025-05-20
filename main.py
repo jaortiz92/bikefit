@@ -13,7 +13,9 @@ def run():
     # DrawPoseValues('video4', 'mp4', is_image=False, is_right=True)
     # DrawPoseValues('mtb_left', 'mp4', is_image=False, is_right=False)
     # DrawPoseValues('mtb_left_slow', 'mp4', is_image=False, is_right=False)
-    DrawPoseValues('VideoMTBLeft', 'mp4', is_image=False, is_right=False)
+    #DrawPoseValues('VideoMTBLeft', 'mp4', is_image=False, is_right=False)
+    DrawPoseValues('road_green_left_e', 'mp4', is_image=False, is_right=False)
+    #DrawPoseValues('road_green_right_e', 'mp4', is_image=False, is_right=True)
 
 
 if __name__ == '__main__':

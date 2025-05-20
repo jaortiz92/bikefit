@@ -16,5 +16,5 @@ class Constants:
     ALPHA_BACKGROUND: int = 0.6
 
 
-    FRAMES_TO_KEY_MOMENTS: int = 5
+    FRAMES_TO_KEY_MOMENTS: int = 15
     MINIMUN_TIME: int = 30 * 6

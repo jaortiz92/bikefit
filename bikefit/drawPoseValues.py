@@ -114,8 +114,9 @@ class DrawPoseValues():
                     if not ret:
                         break
 
-                    yolo_masks = self.get_yolo_person_mask(frame)
-                    roi_frame = cv2.bitwise_and(frame, frame, mask=yolo_masks)
+                    #yolo_masks = self.get_yolo_person_mask(frame)
+                    #roi_frame = cv2.bitwise_and(frame, frame, mask=yolo_masks)
+                    roi_frame = frame
 
                     image_rgb = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2RGB)
                     image_rgb = self._preprocess_frame(image_rgb)
@@ -136,8 +137,8 @@ class DrawPoseValues():
                     else:
                         out.write(image)
 
-                    cv2.imshow('Cyclist Tracking', frame)
-                    cv2.imshow('Cyclist Trackingmask', roi_frame)
+                    #cv2.imshow('Cyclist Tracking', frame)
+                    #cv2.imshow('Cyclist Trackingmask', roi_frame)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
 
