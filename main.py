@@ -1,21 +1,31 @@
-from bikefit import DrawPoseValues
+from typing import List
+from bikefit import DrawPoseValues, Constants
+import os
 
 
 def run():
-    DrawPoseValues('image2', 'jpeg', is_right=False)
-    DrawPoseValues('image3', 'jpeg', is_right=False)
-    DrawPoseValues('image4', 'jpeg', is_right=True)
-    DrawPoseValues('image6', 'jpeg', is_right=True)
-    DrawPoseValues('image', 'jpeg', is_right=False)
-    # DrawPoseValues('video', 'mp4', is_image=False, is_right=True)
-    # DrawPoseValues('video2', 'mp4', is_image=False, is_right=False)
-    # DrawPoseValues('video3', 'mp4', is_image=False, is_right=True)
-    # DrawPoseValues('video4', 'mp4', is_image=False, is_right=True)
-    # DrawPoseValues('mtb_left', 'mp4', is_image=False, is_right=False)
-    # DrawPoseValues('mtb_left_slow', 'mp4', is_image=False, is_right=False)
+    read_folder('spinning')
+    read_folder('general_left', is_right=False)
+    read_folder('general_right', is_right=False)
+    #DrawPoseValues('spinning_right_slow', 'mp4', is_image=False, is_right=True)
+    #DrawPoseValues('spinning_right_gopro', 'mp4', is_image=False, is_right=True)
     #DrawPoseValues('VideoMTBLeft', 'mp4', is_image=False, is_right=False)
-    DrawPoseValues('road_green_left_e', 'mp4', is_image=False, is_right=False)
+    #DrawPoseValues('VideoMTBLeft', 'mp4', is_image=False, is_right=False)
     #DrawPoseValues('road_green_right_e', 'mp4', is_image=False, is_right=True)
+
+def read_folder(name_folder: str, is_right: bool=True) -> List[str]:
+    files: List[str] = os.listdir(Constants.IN + name_folder)
+    formats: List[str] = ['jpeg', 'jpg', 'png']
+    for file in files:
+        if file.split('.')[-1] in formats:
+            DrawPoseValues(
+                file.split('.')[0], 
+                file.split('.')[-1],
+                is_image=True,
+                is_right=is_right,
+                folder=name_folder
+            )
+
 
 
 if __name__ == '__main__':

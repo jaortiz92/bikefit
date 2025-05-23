@@ -1,8 +1,8 @@
 from typing import Tuple
 
 class Constants:
-    IN: str = './in'
-    OUT: str = './out'
+    IN: str = './in/'
+    OUT: str = './out/'
 
     COLOR_POINT: Tuple[int] = (250, 100, 250)
     COLOR_CONNECTION: Tuple[int] = (250, 250, 250)

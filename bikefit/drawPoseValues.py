@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 
 from .constants import Constants
@@ -11,19 +12,33 @@ from ultralytics import YOLO
 
 
 class DrawPoseValues():
-    model = YOLO("yolo11s-seg")
+    model = YOLO("yolo11m-seg")
 
     def __init__(
         self, name: str,
         format: str, is_image: bool = True,
-        is_right: bool = True
+        is_right: bool = True,
+        folder: str = None
     ):
         self.is_image: bool = is_image
         self.is_right: bool = is_right
         self.counter: int = 0
-        self.name_input: str = '{}/{}.{}'.format(Constants.IN, name, format)
-        self.name_output: str = '{}/result_{}.{}'.format(
+        if folder is None:
+            self.name_input: str = '{}{}.{}'.format(Constants.IN, name, format)
+            self.name_output: str = '{}result_{}.{}'.format(
             Constants.OUT, name, format)
+        else:
+            path_in: str = '{}{}/'.format(Constants.IN, folder)
+            path_out: str = '{}{}/'.format(Constants.OUT, folder)
+            self.name_input: str = '{}{}.{}'.format(path_in, name, format)
+            self.name_output: str = '{}result_{}.{}'.format(
+                path_out, name, format
+            )
+            if not os.path.exists(path_out):
+                os.makedirs(path_out)
+
+        print(self.name_input)
+
         self.key_moments: dict = {
             'lowest_point': None,
             'highest_point': None,
@@ -114,9 +129,9 @@ class DrawPoseValues():
                     if not ret:
                         break
 
-                    #yolo_masks = self.get_yolo_person_mask(frame)
-                    #roi_frame = cv2.bitwise_and(frame, frame, mask=yolo_masks)
-                    roi_frame = frame
+                    yolo_masks = self.get_yolo_person_mask(frame)
+                    roi_frame = cv2.bitwise_and(frame, frame, mask=yolo_masks)
+                    #roi_frame = frame
 
                     image_rgb = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2RGB)
                     image_rgb = self._preprocess_frame(image_rgb)
@@ -149,12 +164,12 @@ class DrawPoseValues():
                 cv2.destroyAllWindows()
 
     def get_yolo_person_mask(self, frame):
-        results = self.model(frame)[0]
+        results = self.model(frame, verbose=False)[0]
         combined_mask = np.zeros(frame.shape[:2], dtype=np.uint8)
 
         if results.masks is not None:
             for mask, cls in zip(results.masks.data, results.boxes.cls):
-                if int(cls) == 0:  # Person class
+                if int(cls) == 0 or int(cls) == 1:  # Person class and cycling
                     mask_np = mask.cpu().numpy().astype(np.uint8) * 255
                     resized_mask = cv2.resize(
                         mask_np, (frame.shape[1], frame.shape[0]))
