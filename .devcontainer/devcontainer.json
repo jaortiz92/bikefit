@@ -1,6 +1,6 @@
 {
     "name": "BikeFit DevContainer",
-    "dockerComposeFile": "../docker-compose.yaml",
+    "dockerComposeFile": "../docker-compose.yaml",  
     "service": "bikefit",
     "workspaceFolder": "/usr/local/app",
 

@@ -2,26 +2,43 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 
 from .constants import Constants
 from .poseValues import PoseValues
 from .utils import save_data
+from ultralytics import YOLO
 
 
 class DrawPoseValues():
+    model = YOLO("yolo11m-seg")
 
     def __init__(
         self, name: str,
         format: str, is_image: bool = True,
-        is_right: bool = True
+        is_right: bool = True,
+        folder: str = None
     ):
         self.is_image: bool = is_image
         self.is_right: bool = is_right
         self.counter: int = 0
-        self.name_input: str = '{}/{}.{}'.format(Constants.IN, name, format)
-        self.name_output: str = '{}/result_{}.{}'.format(
+        if folder is None:
+            self.name_input: str = '{}{}.{}'.format(Constants.IN, name, format)
+            self.name_output: str = '{}result_{}.{}'.format(
             Constants.OUT, name, format)
+        else:
+            path_in: str = '{}{}/'.format(Constants.IN, folder)
+            path_out: str = '{}{}/'.format(Constants.OUT, folder)
+            self.name_input: str = '{}{}.{}'.format(path_in, name, format)
+            self.name_output: str = '{}result_{}.{}'.format(
+                path_out, name, format
+            )
+            if not os.path.exists(path_out):
+                os.makedirs(path_out)
+
+        print(self.name_input)
+
         self.key_moments: dict = {
             'lowest_point': None,
             'highest_point': None,
@@ -45,16 +62,18 @@ class DrawPoseValues():
     def _preprocess_frame(self, frame):
         """Proprocess the image or frame to a better result"""
         # Upscale 2x
-        high_res = cv2.resize(frame, (0,0), fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
-        
+        high_res = cv2.resize(
+            frame, (0, 0), fx=2, fy=2,
+            interpolation=cv2.INTER_CUBIC
+        )
+
         # CLAHE para contraste
         lab = cv2.cvtColor(high_res, cv2.COLOR_RGB2LAB)
         l, a, b = cv2.split(lab)
-        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
+        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
         l = clahe.apply(l)
-        enhanced = cv2.merge((l,a,b))
+        enhanced = cv2.merge((l, a, b))
         return cv2.cvtColor(enhanced, cv2.COLOR_LAB2RGB)
-
 
     def generate(self):
         mp_drawing = mp.solutions.drawing_utils
@@ -63,10 +82,11 @@ class DrawPoseValues():
         with mp_pose.Pose(
             static_image_mode=self.is_image,
             model_complexity=2,       # Máxima complejidad del modelo
-            smooth_landmarks= not self.is_image,    # Suavizado entre frames
-            min_detection_confidence= 0.8 if self.is_image else 0.95,  # Más estricto para evitar falsos positivos
+            smooth_landmarks=not self.is_image,    # Suavizado entre frames
+            # Más estricto para evitar falsos positivos
+            min_detection_confidence=0.8 if self.is_image else 0.95,
             min_tracking_confidence=0.99,    # Exigir seguimiento consistente
-            enable_segmentation=False,        # Usar máscara para aislar al ciclista
+            enable_segmentation=True,        # Usar máscara para aislar al ciclista
             smooth_segmentation=True,        # Suavizar máscara entre frames
         ) as pose:
             if self.is_image:
@@ -91,6 +111,15 @@ class DrawPoseValues():
                 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
                 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+                # Create background subtractor
+                bg_subtractor = cv2.createBackgroundSubtractorMOG2(
+                    history=500,  # Frames used to create the background
+                    varThreshold=10,  # Sensibility to the movements
+                    detectShadows=True,  # Detect shadow
+                )
+                kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+                heatmap_refined = None
+
                 out = cv2.VideoWriter(
                     self.name_output,
                     fourcc, fps, (width, height))
@@ -100,7 +129,11 @@ class DrawPoseValues():
                     if not ret:
                         break
 
-                    image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    yolo_masks = self.get_yolo_person_mask(frame)
+                    roi_frame = cv2.bitwise_and(frame, frame, mask=yolo_masks)
+                    #roi_frame = frame
+
+                    image_rgb = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2RGB)
                     image_rgb = self._preprocess_frame(image_rgb)
                     result_pose = pose.process(image_rgb)
 
@@ -119,7 +152,8 @@ class DrawPoseValues():
                     else:
                         out.write(image)
 
-                    cv2.imshow('Cyclist Tracking', frame)
+                    #cv2.imshow('Cyclist Tracking', frame)
+                    #cv2.imshow('Cyclist Trackingmask', roi_frame)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
                         break
 
@@ -128,6 +162,20 @@ class DrawPoseValues():
                 cap.release()
                 out.release()
                 cv2.destroyAllWindows()
+
+    def get_yolo_person_mask(self, frame):
+        results = self.model(frame, verbose=False)[0]
+        combined_mask = np.zeros(frame.shape[:2], dtype=np.uint8)
+
+        if results.masks is not None:
+            for mask, cls in zip(results.masks.data, results.boxes.cls):
+                if int(cls) == 0 or int(cls) == 1:  # Person class and cycling
+                    mask_np = mask.cpu().numpy().astype(np.uint8) * 255
+                    resized_mask = cv2.resize(
+                        mask_np, (frame.shape[1], frame.shape[0]))
+                    combined_mask = cv2.bitwise_or(combined_mask, resized_mask)
+
+        return combined_mask
 
     def add_values(
             self, result_pose, image, is_right: bool,
@@ -152,7 +200,6 @@ class DrawPoseValues():
                 y1 = landmarks[connection[0][1]].y
                 y2 = landmarks[connection[1][1]].y
 
-
             start_point = mp.solutions.drawing_utils._normalized_to_pixel_coordinates(
                 x1, y1, width, height
             )
@@ -169,7 +216,7 @@ class DrawPoseValues():
                         Constants.COLOR_CONNECTION_SECONDARY,
                         Constants.LINE_SIZE_SECONDARY
                     )
-                else: 
+                else:
                     cv2.line(
                         image,
                         start_point,
@@ -177,7 +224,6 @@ class DrawPoseValues():
                         Constants.COLOR_CONNECTION,
                         Constants.LINE_SIZE
                     )
-
 
         # Draw points
         for point in points:
