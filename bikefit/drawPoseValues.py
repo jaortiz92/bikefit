@@ -8,11 +8,11 @@ import os
 from .constants import Constants
 from .poseValues import PoseValues
 from .utils import save_data
-from ultralytics import YOLO
+#from ultralytics import YOLO
 
 
 class DrawPoseValues():
-    model = YOLO("yolo11m-seg")
+    #model = YOLO("yolo11m-seg")
 
     def __init__(
         self, name: str,
@@ -129,9 +129,9 @@ class DrawPoseValues():
                     if not ret:
                         break
 
-                    yolo_masks = self.get_yolo_person_mask(frame)
-                    roi_frame = cv2.bitwise_and(frame, frame, mask=yolo_masks)
-                    #roi_frame = frame
+                    #yolo_masks = self.get_yolo_person_mask(frame)
+                    #roi_frame = cv2.bitwise_and(frame, frame, mask=yolo_masks)
+                    roi_frame = frame
 
                     image_rgb = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2RGB)
                     image_rgb = self._preprocess_frame(image_rgb)

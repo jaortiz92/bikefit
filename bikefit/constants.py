@@ -4,7 +4,7 @@ class Constants:
     IN: str = './in/'
     OUT: str = './out/'
 
-    COLOR_POINT: Tuple[int] = (250, 100, 250)
+    COLOR_POINT: Tuple[int] = (0, 255, 0)
     COLOR_CONNECTION: Tuple[int] = (250, 250, 250)
     COLOR_CONNECTION_SECONDARY: Tuple[int] = (200, 200, 200)
     COLOR_FONT: Tuple[int] = (0, 0, 0)
@@ -16,5 +16,5 @@ class Constants:
     ALPHA_BACKGROUND: int = 0.6
 
 
-    FRAMES_TO_KEY_MOMENTS: int = 15
+    FRAMES_TO_KEY_MOMENTS: int = 2
     MINIMUN_TIME: int = 30 * 6
