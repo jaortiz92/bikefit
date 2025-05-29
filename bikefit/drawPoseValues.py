@@ -18,10 +18,12 @@ class DrawPoseValues():
         self, name: str,
         format: str, is_image: bool = True,
         is_right: bool = True,
-        folder: str = None
+        folder: str = None,
+        show: bool = False
     ):
         self.is_image: bool = is_image
         self.is_right: bool = is_right
+        self.show: bool = show
         self.counter: int = 0
         if folder is None:
             self.name_input: str = '{}{}.{}'.format(Constants.IN, name, format)
@@ -152,10 +154,11 @@ class DrawPoseValues():
                     else:
                         out.write(image)
 
-                    #cv2.imshow('Cyclist Tracking', frame)
-                    #cv2.imshow('Cyclist Trackingmask', roi_frame)
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                        break
+                    if self.show:
+                        cv2.imshow('Cyclist Tracking', frame)
+                        cv2.imshow('Cyclist Trackingmask', roi_frame)
+                        if cv2.waitKey(1) & 0xFF == ord('q'):
+                            break
 
                     self.counter += 1
 
