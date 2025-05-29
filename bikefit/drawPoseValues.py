@@ -156,7 +156,7 @@ class DrawPoseValues():
 
                     if self.show:
                         cv2.imshow('Cyclist Tracking', frame)
-                        cv2.imshow('Cyclist Trackingmask', roi_frame)
+                        #cv2.imshow('Cyclist Trackingmask', roi_frame)
                         if cv2.waitKey(1) & 0xFF == ord('q'):
                             break
 
@@ -259,19 +259,26 @@ class DrawPoseValues():
 
         self.validate_special_moment(lowest_y, highest_y, middle_x)
 
+        #Draw Angles
         data_temp = []
         for name_angle, angle_def in angles.items():
             try:
                 points = [
-                    (landmarks[p[0]].x * width, landmarks[p[1]].y * height)
-                    if isinstance(p, tuple) else
-                    (landmarks[p].x * width, landmarks[p].y * height)
-                    for p in angle_def
+                    (
+                        landmarks[angle_def[i][0]].x * width, 
+                        landmarks[angle_def[i][1]].y * height
+                    )
+                    if isinstance(angle_def[i], tuple) else
+                    (
+                        landmarks[angle_def[i]].x * width,
+                        landmarks[angle_def[i]].y * height
+                    )
+                    for i in range(3)
                 ]
 
                 angle = PoseValues.get_angle(*points)
                 self.draw_angle_display(
-                    image, points[2], angle, Constants.ALPHA_BACKGROUND
+                    image, points[2], angle, Constants.ALPHA_BACKGROUND, angle_def[3]
                 )
 
                 if self.key_moments['status']:
@@ -286,10 +293,13 @@ class DrawPoseValues():
 
         return image
 
-    def draw_angle_display(self, frame, center_point, angle, alpha):
+    def draw_angle_display(self, frame, center_point, angle, alpha, secundaryAngle: False):
         overlay = frame.copy()
         x_center, y_center = center_point
-        text_pos = (int(x_center * 1.05), int(y_center))
+        text_pos = (
+            (int(x_center * 1.08), int(y_center * 0.92)) if secundaryAngle else 
+            (int(x_center * 1.08), int(y_center))
+        )
         color_background = (
             Constants.COLOR_BACKGROUND_ESPECIAL
             if self.key_moments['status'] else

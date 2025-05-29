@@ -38,6 +38,10 @@ class PoseValues():
 
     @classmethod
     def get_left_body(cls) -> list:
+        '''
+        return:
+         List[points, connections, angles, special_moments]
+        '''
         special_point_one = (cls.LEFT_HEEL, cls.LEFT_FOOT_INDEX)
         special_point_two = (cls.LEFT_SHOULDER, cls.LEFT_HIP)
         foot_index = (cls.LEFT_FOOT_INDEX, cls.LEFT_FOOT_INDEX)
@@ -70,25 +74,27 @@ class PoseValues():
                 (cls.LEFT_ELBOW, cls.LEFT_WRIST),
                 (cls.LEFT_ANKLE, cls.LEFT_HEEL),
                 (cls.LEFT_HEEL, cls.LEFT_FOOT_INDEX),
-                (cls.LEFT_ANKLE, cls.LEFT_FOOT_INDEX),
                 (special_point_one,foot_index),
                 (special_point_two, hip)
             ],
             {
                 'lower_part':[
-                    cls.LEFT_ANKLE, cls.LEFT_HIP, cls.LEFT_KNEE
+                    cls.LEFT_ANKLE, cls.LEFT_HIP, cls.LEFT_KNEE, False
                 ],
                 'mid_part':[
-                    special_point_two, cls.LEFT_SHOULDER, cls.LEFT_HIP
+                    cls.LEFT_KNEE, cls.LEFT_SHOULDER, cls.LEFT_HIP, False
+                ],
+                'back':[
+                    special_point_two, cls.LEFT_SHOULDER, cls.LEFT_HIP, True
                 ],
                 'hight_part':[
-                    cls.LEFT_HIP, cls.LEFT_ELBOW, cls.LEFT_SHOULDER
+                    cls.LEFT_HIP, cls.LEFT_WRIST, cls.LEFT_SHOULDER, False
                 ],
                 'arm':[
-                    cls.LEFT_SHOULDER, cls.LEFT_WRIST, cls.LEFT_ELBOW
+                    cls.LEFT_SHOULDER, cls.LEFT_WRIST, cls.LEFT_ELBOW, False
                 ],
                 'foot':[
-                    cls.LEFT_KNEE,  cls.LEFT_FOOT_INDEX, cls.LEFT_ANKLE
+                    cls.LEFT_KNEE,  cls.LEFT_FOOT_INDEX, cls.LEFT_ANKLE, False
                 ]
             },
             keys_to_special_moments
@@ -96,6 +102,15 @@ class PoseValues():
 
     @classmethod
     def get_right_body(cls) -> list:
+        '''
+        return:
+         List[
+            points, 
+            connections, 
+            angles[point_one, point_two, center, is_secundary], 
+            special_moments
+        ]
+        '''
         special_point_one = (cls.RIGHT_HEEL, cls.RIGHT_FOOT_INDEX)
         special_point_two = (cls.RIGHT_SHOULDER, cls.RIGHT_HIP)
         foot_index = (cls.RIGHT_FOOT_INDEX, cls.RIGHT_FOOT_INDEX)
@@ -130,25 +145,27 @@ class PoseValues():
                 (cls.RIGHT_ELBOW, cls.RIGHT_WRIST),
                 (cls.RIGHT_ANKLE, cls.RIGHT_HEEL),
                 (cls.RIGHT_HEEL, cls.RIGHT_FOOT_INDEX),
-                (cls.RIGHT_ANKLE, cls.RIGHT_FOOT_INDEX),
                 (special_point_one,foot_index),
                 (special_point_two, hip)
             ],
             {
                 'lower_part':[
-                    cls.RIGHT_ANKLE, cls.RIGHT_HIP, cls.RIGHT_KNEE
+                    cls.RIGHT_ANKLE, cls.RIGHT_HIP, cls.RIGHT_KNEE, False
                 ],
                 'mid_part':[
-                    special_point_two, cls.RIGHT_SHOULDER, cls.RIGHT_HIP
+                    cls.RIGHT_KNEE, cls.RIGHT_SHOULDER, cls.RIGHT_HIP, False
+                ],
+                'back':[
+                    special_point_two, cls.RIGHT_SHOULDER, cls.RIGHT_HIP, True
                 ],
                 'hight_part':[
-                    cls.RIGHT_HIP, cls.RIGHT_ELBOW, cls.RIGHT_SHOULDER
+                    cls.RIGHT_HIP, cls.RIGHT_WRIST, cls.RIGHT_SHOULDER, False
                 ],
                 'arm':[
-                    cls.RIGHT_SHOULDER, cls.RIGHT_WRIST, cls.RIGHT_ELBOW
+                    cls.RIGHT_SHOULDER, cls.RIGHT_WRIST, cls.RIGHT_ELBOW, False
                 ],
                 'foot':[
-                    cls.RIGHT_KNEE,  cls.RIGHT_FOOT_INDEX, cls.RIGHT_ANKLE
+                    cls.RIGHT_KNEE,  cls.RIGHT_FOOT_INDEX, cls.RIGHT_ANKLE, False
                 ]
             },
             keys_to_special_moments
