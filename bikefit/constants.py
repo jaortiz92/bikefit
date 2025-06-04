@@ -18,3 +18,10 @@ class Constants:
 
     FRAMES_TO_KEY_MOMENTS: int = 1
     MINIMUN_TIME: int = 30 * 6
+
+
+    #Pose types
+    FRONT: str = 'front'
+    BACK: str = 'back'
+    LEFT: str = 'left'
+    RIGHT: str = 'right'

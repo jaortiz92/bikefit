@@ -4,14 +4,16 @@ import os
 
 
 def run():
-    read_folder('spinning')
-    read_folder('general_left', is_right=False)
-    read_folder('general_right', is_right=False)
+    #read_folder('spinning')
+    #read_folder('general_left', is_right=False)
+    #read_folder('general_right', is_right=False)
     #DrawPoseValues('spinning_right_slow', 'mp4', is_image=False, is_right=True)
     #DrawPoseValues('spinning_right_gopro', 'mp4', is_image=False, is_right=True)
     #DrawPoseValues('VideoMTBLeft', 'mp4', is_image=False, is_right=False)
     #DrawPoseValues('VideoMTBLeft', 'mp4', is_image=False, is_right=False)
     #DrawPoseValues('road_green_right_e', 'mp4', is_image=False, is_right=True)
+    #DrawPoseValues('Road_Green_Front_25-05-24', 'mp4', is_image=False, pose_type=Constants.FRONT, show=True)
+    DrawPoseValues('Road_Green_Back_25-05-24', 'mp4', is_image=False, pose_type=Constants.BACK, show=True)
 
 def read_folder(name_folder: str, is_right: bool=True) -> List[str]:
     files: List[str] = os.listdir(Constants.IN + name_folder)

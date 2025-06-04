@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Literal
 import os
 
 
@@ -17,12 +18,12 @@ class DrawPoseValues():
     def __init__(
         self, name: str,
         format: str, is_image: bool = True,
-        is_right: bool = True,
+        pose_type: Literal['front', 'back', 'left', 'right'] = Constants.RIGHT,
         folder: str = None,
         show: bool = False
     ):
         self.is_image: bool = is_image
-        self.is_right: bool = is_right
+        self.pose_type: bool = pose_type
         self.show: bool = show
         self.counter: int = 0
         if folder is None:
@@ -102,7 +103,7 @@ class DrawPoseValues():
                 if result_pose.pose_landmarks:
                     image = self.add_values(
                         result_pose, image,
-                        self.is_right, width, height
+                        self.pose_type, width, height
                     )
                     cv2.imwrite(self.name_output, image)
 
@@ -142,7 +143,7 @@ class DrawPoseValues():
                     if result_pose.pose_landmarks:
                         image = self.add_values(
                             result_pose, frame,
-                            self.is_right, width,
+                            self.pose_type, width,
                             height
                         )
                     else:
@@ -181,12 +182,17 @@ class DrawPoseValues():
         return combined_mask
 
     def add_values(
-            self, result_pose, image, is_right: bool,
+            self, result_pose, image, pose_type: str,
             width: int, height: int
     ):
         landmarks = result_pose.pose_landmarks.landmark
 
-        funct = PoseValues.get_right_body if is_right else PoseValues.get_left_body
+        if pose_type in (Constants.FRONT, Constants.RIGHT):
+            funct = PoseValues.get_front_and_back_body
+        elif pose_type == Constants.LEFT:
+            funct = PoseValues.get_left_body
+        else:
+            funct = PoseValues.get_right_body
 
         points, connections, angles, special_moments = funct()
 
