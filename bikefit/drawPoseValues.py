@@ -87,8 +87,8 @@ class DrawPoseValues():
             model_complexity=2,       # Máxima complejidad del modelo
             smooth_landmarks=not self.is_image,    # Suavizado entre frames
             # Más estricto para evitar falsos positivos
-            min_detection_confidence=0.8 if self.is_image else 0.95,
-            min_tracking_confidence=0.99,    # Exigir seguimiento consistente
+            min_detection_confidence=0.8 if self.is_image else 0.7,
+            min_tracking_confidence=0.7,    # Exigir seguimiento consistente
             enable_segmentation=True,        # Usar máscara para aislar al ciclista
             smooth_segmentation=True,        # Suavizar máscara entre frames
         ) as pose:
@@ -187,12 +187,14 @@ class DrawPoseValues():
     ):
         landmarks = result_pose.pose_landmarks.landmark
 
-        if pose_type in (Constants.FRONT, Constants.RIGHT):
-            funct = PoseValues.get_front_and_back_body
+        if pose_type == Constants.RIGHT:
+            funct = PoseValues.get_right_body
         elif pose_type == Constants.LEFT:
             funct = PoseValues.get_left_body
+        elif pose_type == Constants.FRONT:
+            funct = PoseValues.get_front_body
         else:
-            funct = PoseValues.get_right_body
+            funct = PoseValues.get_back_body
 
         points, connections, angles, special_moments = funct()
 

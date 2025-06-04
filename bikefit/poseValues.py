@@ -172,7 +172,7 @@ class PoseValues():
         ]
 
     @classmethod
-    def get_front_and_back_body(cls) -> list:
+    def get_front_body(cls) -> list:
         '''
         return:
          List[
@@ -211,8 +211,6 @@ class PoseValues():
                 cls.RIGHT_ANKLE,
                 cls.LEFT_HEEL,
                 cls.RIGHT_HEEL,
-                cls.LEFT_FOOT_INDEX,
-                cls.RIGHT_FOOT_INDEX
             ],
             [
                 (cls.LEFT_SHOULDER, cls.RIGHT_SHOULDER),
@@ -229,8 +227,6 @@ class PoseValues():
                 (cls.RIGHT_KNEE, cls.RIGHT_ANKLE),
                 (cls.LEFT_ANKLE, cls.LEFT_HEEL),
                 (cls.RIGHT_ANKLE, cls.RIGHT_HEEL),
-                (cls.LEFT_HEEL, cls.LEFT_FOOT_INDEX),
-                (cls.RIGHT_HEEL, cls.RIGHT_FOOT_INDEX)
             ],
             {
                 'mid_part_left':[
@@ -254,6 +250,68 @@ class PoseValues():
             },
             keys_to_special_moments
         ]
+    
+
+    @classmethod
+    def get_back_body(cls) -> list:
+        '''
+        return:
+         List[
+            points, 
+            connections, 
+            angles[point_one, point_two, center, is_secundary], 
+            special_moments
+        ]
+        '''
+        special_point_one = (cls.RIGHT_HEEL, cls.RIGHT_FOOT_INDEX)
+        special_point_two = (cls.RIGHT_SHOULDER, cls.RIGHT_HIP)
+        foot_index = (cls.RIGHT_FOOT_INDEX, cls.RIGHT_FOOT_INDEX)
+        hip = (cls.RIGHT_HIP, cls.RIGHT_HIP)
+
+        heel = (cls.RIGHT_HEEL, cls.RIGHT_HEEL)
+
+        keys_to_special_moments = {
+            'lowest_point': special_point_one,
+            'highest_point': special_point_one,
+            'middle_point': special_point_one
+        }
+
+        return [
+            [
+                cls.LEFT_SHOULDER,
+                cls.RIGHT_SHOULDER,
+                cls.LEFT_HIP,
+                cls.RIGHT_HIP,
+                cls.LEFT_KNEE,
+                cls.RIGHT_KNEE,
+                cls.LEFT_ANKLE,
+                cls.RIGHT_ANKLE,
+                cls.LEFT_HEEL,
+                cls.RIGHT_HEEL,
+            ],
+            [
+                (cls.LEFT_SHOULDER, cls.RIGHT_SHOULDER),
+                (cls.LEFT_HIP, cls.LEFT_SHOULDER),
+                (cls.RIGHT_HIP, cls.RIGHT_SHOULDER),
+                (cls.LEFT_HIP, cls.RIGHT_HIP),
+                (cls.LEFT_KNEE, cls.LEFT_HIP),
+                (cls.RIGHT_KNEE, cls.RIGHT_HIP),
+                (cls.LEFT_KNEE, cls.LEFT_ANKLE),
+                (cls.RIGHT_KNEE, cls.RIGHT_ANKLE),
+                (cls.LEFT_ANKLE, cls.LEFT_HEEL),
+                (cls.RIGHT_ANKLE, cls.RIGHT_HEEL),
+            ],
+            {
+                'mid_part_left':[
+                    cls.LEFT_HIP, cls.RIGHT_SHOULDER, cls.RIGHT_HIP, False
+                ],
+                'mid_part_right':[
+                    cls.RIGHT_HIP, cls.LEFT_SHOULDER, cls.LEFT_HIP, False
+                ],
+            },
+            keys_to_special_moments
+        ]
+
 
     @classmethod
     def get_angle(cls, a, b, center):
