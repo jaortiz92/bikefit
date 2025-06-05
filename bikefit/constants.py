@@ -19,6 +19,11 @@ class Constants:
     FRAMES_TO_KEY_MOMENTS: int = 1
     MINIMUN_TIME: int = 30 * 6
 
+    #ANGLE_LOCATION
+    ANGLE_X_FACTOR: float = 0.03
+    ANGLE_Y_FACTOR: float = 0
+    SECONDARY_ANGLE_Y_FACTOR: float = 0.04
+
 
     #Pose types
     FRONT: str = 'front'

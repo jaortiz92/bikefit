@@ -135,7 +135,7 @@ class DrawPoseValues():
                     #yolo_masks = self.get_yolo_person_mask(frame)
                     #roi_frame = cv2.bitwise_and(frame, frame, mask=yolo_masks)
                     roi_frame = frame
-
+                    
                     image_rgb = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2RGB)
                     image_rgb = self._preprocess_frame(image_rgb)
                     result_pose = pose.process(image_rgb)
@@ -219,21 +219,21 @@ class DrawPoseValues():
             )
 
             if start_point and end_point:
-                if len(connections) - 2 <= index:
-                    cv2.line(
-                        image,
-                        start_point,
-                        end_point,
-                        Constants.COLOR_CONNECTION_SECONDARY,
-                        Constants.LINE_SIZE_SECONDARY
-                    )
-                else:
+                if connection[2]:
                     cv2.line(
                         image,
                         start_point,
                         end_point,
                         Constants.COLOR_CONNECTION,
                         Constants.LINE_SIZE
+                    )
+                else:
+                    cv2.line(
+                        image,
+                        start_point,
+                        end_point,
+                        Constants.COLOR_CONNECTION_SECONDARY,
+                        Constants.LINE_SIZE_SECONDARY
                     )
 
         # Draw points
@@ -286,7 +286,8 @@ class DrawPoseValues():
 
                 angle = PoseValues.get_angle(*points)
                 self.draw_angle_display(
-                    image, points[2], angle, Constants.ALPHA_BACKGROUND, angle_def[3]
+                    image, points[2], angle, Constants.ALPHA_BACKGROUND, 
+                    width, height, angle_def[3]
                 )
 
                 if self.key_moments['status']:
@@ -301,13 +302,22 @@ class DrawPoseValues():
 
         return image
 
-    def draw_angle_display(self, frame, center_point, angle, alpha, secundaryAngle: False):
+    def draw_angle_display(self, frame, center_point, angle, alpha, width, height, secundaryAngle: False):
         overlay = frame.copy()
+
         x_center, y_center = center_point
-        text_pos = (
-            (int(x_center * 1.08), int(y_center * 0.92)) if secundaryAngle else 
-            (int(x_center * 1.08), int(y_center))
-        )
+
+        if not secundaryAngle: 
+            text_pos = (
+                int(x_center + width * Constants.ANGLE_X_FACTOR),
+                int(y_center - height * Constants.ANGLE_Y_FACTOR),
+            )
+        else:
+            text_pos = (
+                int(x_center + width * Constants.ANGLE_X_FACTOR),
+                int(y_center - height * Constants.SECONDARY_ANGLE_Y_FACTOR),
+            )
+        
         color_background = (
             Constants.COLOR_BACKGROUND_ESPECIAL
             if self.key_moments['status'] else

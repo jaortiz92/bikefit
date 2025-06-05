@@ -44,6 +44,7 @@ class PoseValues():
         '''
         special_point_one = (cls.LEFT_HEEL, cls.LEFT_FOOT_INDEX)
         special_point_two = (cls.LEFT_SHOULDER, cls.LEFT_HIP)
+        special_point_three = (cls.LEFT_ANKLE, cls.LEFT_HEEL)
         foot_index = (cls.LEFT_FOOT_INDEX, cls.LEFT_FOOT_INDEX)
         hip = (cls.LEFT_HIP, cls.LEFT_HIP)
         heel = (cls.LEFT_HEEL, cls.LEFT_HEEL)
@@ -66,16 +67,16 @@ class PoseValues():
                 special_point_one
             ],
             [
-                (cls.LEFT_ANKLE, cls.LEFT_KNEE),
-                (cls.LEFT_KNEE, cls.LEFT_HIP),
-                (cls.LEFT_HIP, cls.LEFT_SHOULDER),
+                (cls.LEFT_ANKLE, cls.LEFT_KNEE, True),
+                (cls.LEFT_KNEE, cls.LEFT_HIP, True),
+                (cls.LEFT_HIP, cls.LEFT_SHOULDER, True),
                 (cls.LEFT_SHOULDER,
-                 cls.LEFT_ELBOW),
-                (cls.LEFT_ELBOW, cls.LEFT_WRIST),
-                (cls.LEFT_ANKLE, cls.LEFT_HEEL),
-                (cls.LEFT_HEEL, cls.LEFT_FOOT_INDEX),
-                (special_point_one,foot_index),
-                (special_point_two, hip)
+                 cls.LEFT_ELBOW, True),
+                (cls.LEFT_ELBOW, cls.LEFT_WRIST, True),
+                (cls.LEFT_ANKLE, cls.LEFT_HEEL, True),
+                (cls.LEFT_HEEL, cls.LEFT_FOOT_INDEX, True),
+                (special_point_one,foot_index, False),
+                (special_point_two, hip, False)
             ],
             {
                 'lower_part':[
@@ -90,11 +91,14 @@ class PoseValues():
                 'hight_part':[
                     cls.LEFT_HIP, cls.LEFT_WRIST, cls.LEFT_SHOULDER, False
                 ],
+                'hight_part_elbow':[
+                    cls.LEFT_HIP, cls.LEFT_ELBOW, cls.LEFT_SHOULDER, True
+                ],
                 'arm':[
                     cls.LEFT_SHOULDER, cls.LEFT_WRIST, cls.LEFT_ELBOW, False
                 ],
                 'foot':[
-                    cls.LEFT_KNEE,  cls.LEFT_FOOT_INDEX, cls.LEFT_ANKLE, False
+                    cls.LEFT_KNEE,  cls.LEFT_FOOT_INDEX, special_point_three, False
                 ]
             },
             keys_to_special_moments
@@ -113,6 +117,7 @@ class PoseValues():
         '''
         special_point_one = (cls.RIGHT_HEEL, cls.RIGHT_FOOT_INDEX)
         special_point_two = (cls.RIGHT_SHOULDER, cls.RIGHT_HIP)
+        special_point_three = (cls.RIGHT_ANKLE, cls.RIGHT_HEEL)
         foot_index = (cls.RIGHT_FOOT_INDEX, cls.RIGHT_FOOT_INDEX)
         hip = (cls.RIGHT_HIP, cls.RIGHT_HIP)
 
@@ -137,16 +142,16 @@ class PoseValues():
                 special_point_one
             ],
             [
-                (cls.RIGHT_ANKLE, cls.RIGHT_KNEE),
-                (cls.RIGHT_KNEE, cls.RIGHT_HIP),
-                (cls.RIGHT_HIP, cls.RIGHT_SHOULDER),
+                (cls.RIGHT_ANKLE, cls.RIGHT_KNEE, True),
+                (cls.RIGHT_KNEE, cls.RIGHT_HIP, True),
+                (cls.RIGHT_HIP, cls.RIGHT_SHOULDER, True),
                 (cls.RIGHT_SHOULDER,
-                 cls.RIGHT_ELBOW),
-                (cls.RIGHT_ELBOW, cls.RIGHT_WRIST),
-                (cls.RIGHT_ANKLE, cls.RIGHT_HEEL),
-                (cls.RIGHT_HEEL, cls.RIGHT_FOOT_INDEX),
-                (special_point_one,foot_index),
-                (special_point_two, hip)
+                 cls.RIGHT_ELBOW, True),
+                (cls.RIGHT_ELBOW, cls.RIGHT_WRIST, True),
+                (cls.RIGHT_ANKLE, cls.RIGHT_HEEL, True),
+                (cls.RIGHT_HEEL, cls.RIGHT_FOOT_INDEX, True),
+                (special_point_one,foot_index, False),
+                (special_point_two, hip, False)
             ],
             {
                 'lower_part':[
@@ -161,11 +166,14 @@ class PoseValues():
                 'hight_part':[
                     cls.RIGHT_HIP, cls.RIGHT_WRIST, cls.RIGHT_SHOULDER, False
                 ],
+                'hight_part_elbow':[
+                    cls.RIGHT_HIP, cls.RIGHT_ELBOW, cls.RIGHT_SHOULDER, True
+                ],
                 'arm':[
                     cls.RIGHT_SHOULDER, cls.RIGHT_WRIST, cls.RIGHT_ELBOW, False
                 ],
                 'foot':[
-                    cls.RIGHT_KNEE,  cls.RIGHT_FOOT_INDEX, cls.RIGHT_ANKLE, False
+                    cls.RIGHT_KNEE,  cls.RIGHT_FOOT_INDEX, special_point_three, False
                 ]
             },
             keys_to_special_moments
@@ -209,24 +217,20 @@ class PoseValues():
                 cls.RIGHT_KNEE,
                 cls.LEFT_ANKLE,
                 cls.RIGHT_ANKLE,
-                cls.LEFT_HEEL,
-                cls.RIGHT_HEEL,
             ],
             [
-                (cls.LEFT_SHOULDER, cls.RIGHT_SHOULDER),
-                (cls.LEFT_ELBOW, cls.LEFT_SHOULDER),
-                (cls.RIGHT_ELBOW, cls.RIGHT_SHOULDER),
-                (cls.LEFT_WRIST, cls.LEFT_ELBOW),
-                (cls.RIGHT_WRIST, cls.RIGHT_ELBOW),
-                (cls.LEFT_HIP, cls.LEFT_SHOULDER),
-                (cls.RIGHT_HIP, cls.RIGHT_SHOULDER),
-                (cls.LEFT_HIP, cls.RIGHT_HIP),
-                (cls.LEFT_KNEE, cls.LEFT_HIP),
-                (cls.RIGHT_KNEE, cls.RIGHT_HIP),
-                (cls.LEFT_KNEE, cls.LEFT_ANKLE),
-                (cls.RIGHT_KNEE, cls.RIGHT_ANKLE),
-                (cls.LEFT_ANKLE, cls.LEFT_HEEL),
-                (cls.RIGHT_ANKLE, cls.RIGHT_HEEL),
+                (cls.LEFT_SHOULDER, cls.RIGHT_SHOULDER, True),
+                (cls.LEFT_ELBOW, cls.LEFT_SHOULDER, True),
+                (cls.RIGHT_ELBOW, cls.RIGHT_SHOULDER, True),
+                (cls.LEFT_WRIST, cls.LEFT_ELBOW, True),
+                (cls.RIGHT_WRIST, cls.RIGHT_ELBOW, True),
+                (cls.LEFT_HIP, cls.LEFT_SHOULDER, True),
+                (cls.RIGHT_HIP, cls.RIGHT_SHOULDER, True),
+                (cls.LEFT_HIP, cls.RIGHT_HIP, True),
+                (cls.LEFT_KNEE, cls.LEFT_HIP, True),
+                (cls.RIGHT_KNEE, cls.RIGHT_HIP, True),
+                (cls.LEFT_KNEE, cls.LEFT_ANKLE, True),
+                (cls.RIGHT_KNEE, cls.RIGHT_ANKLE, True),
             ],
             {
                 'mid_part_left':[
@@ -286,20 +290,16 @@ class PoseValues():
                 cls.RIGHT_KNEE,
                 cls.LEFT_ANKLE,
                 cls.RIGHT_ANKLE,
-                cls.LEFT_HEEL,
-                cls.RIGHT_HEEL,
             ],
             [
-                (cls.LEFT_SHOULDER, cls.RIGHT_SHOULDER),
-                (cls.LEFT_HIP, cls.LEFT_SHOULDER),
-                (cls.RIGHT_HIP, cls.RIGHT_SHOULDER),
-                (cls.LEFT_HIP, cls.RIGHT_HIP),
-                (cls.LEFT_KNEE, cls.LEFT_HIP),
-                (cls.RIGHT_KNEE, cls.RIGHT_HIP),
-                (cls.LEFT_KNEE, cls.LEFT_ANKLE),
-                (cls.RIGHT_KNEE, cls.RIGHT_ANKLE),
-                (cls.LEFT_ANKLE, cls.LEFT_HEEL),
-                (cls.RIGHT_ANKLE, cls.RIGHT_HEEL),
+                (cls.LEFT_SHOULDER, cls.RIGHT_SHOULDER, True),
+                (cls.LEFT_HIP, cls.LEFT_SHOULDER, True),
+                (cls.RIGHT_HIP, cls.RIGHT_SHOULDER, True),
+                (cls.LEFT_HIP, cls.RIGHT_HIP, True),
+                (cls.LEFT_KNEE, cls.LEFT_HIP, True),
+                (cls.RIGHT_KNEE, cls.RIGHT_HIP, True),
+                (cls.LEFT_KNEE, cls.LEFT_ANKLE, True),
+                (cls.RIGHT_KNEE, cls.RIGHT_ANKLE, True),
             ],
             {
                 'mid_part_left':[
